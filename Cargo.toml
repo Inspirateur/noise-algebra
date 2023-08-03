@@ -1,0 +1,13 @@
+[package]
+name = "noise-algebra"
+version = "0.1.0"
+edition = "2021"
+description = "Easy manipulation of noise functions"
+repository = "https://github.com/Inspirateur/noise-algebra"
+keywords = ["noise", "procedural", "generation", "simplex", "perlin"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+num-traits = "*"
+noise = "*"
