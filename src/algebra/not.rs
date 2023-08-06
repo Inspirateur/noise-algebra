@@ -1,4 +1,4 @@
-use std::ops::{RangeInclusive, Sub};
+use std::ops::RangeInclusive;
 use ndarray::Array1;
 
 use crate::noise::{Noise, NoiseSource, NoiseRange};
