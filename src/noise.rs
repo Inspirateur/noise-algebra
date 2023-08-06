@@ -1,27 +1,18 @@
 use std::ops::RangeInclusive;
-use num_traits::NumCast;
+use ndarray::Array1;
 
-pub trait Noise {
-    fn sample(&self, x: f64, y: f64, seed: usize) -> f64;
+pub trait NoiseRange: ExactSizeIterator<Item = i32> + Clone {}
+impl<R: ExactSizeIterator<Item = i32> + Clone> NoiseRange for R {}
+
+pub trait Noise: Clone {
+    fn sample<R: NoiseRange>(&self, x_range: R, y_range: R, seed: usize) -> Array1<f64>;
 
     fn domain(&self) -> RangeInclusive<f64>;
 }
 
-impl<Num: NumCast> Noise for Num {
-    #[inline]
-    fn sample(&self, _x: f64, _y: f64, _seed: usize) -> f64 {
-        self.to_f64().unwrap()
-    }
-
-    fn domain(&self) -> RangeInclusive<f64> {
-        let value = self.to_f64().unwrap();
-        value..=value
-    }
-}
-
+#[derive(Clone)]
 pub struct NoiseSource<X: Noise> {
-    pub noise: X,
-    pub domain: RangeInclusive<f64>
+    pub noise: X
 }
 
 

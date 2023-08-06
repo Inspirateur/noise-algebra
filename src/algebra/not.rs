@@ -1,15 +1,18 @@
-use std::ops::RangeInclusive;
-use crate::noise::{Noise, NoiseSource};
+use std::ops::{RangeInclusive, Sub};
+use ndarray::Array1;
 
+use crate::noise::{Noise, NoiseSource, NoiseRange};
+
+#[derive(Clone)]
 pub struct NoiseNot<N: Noise>(N);
 
 impl<N: Noise> Noise for NoiseNot<N> {
     #[inline]
-    fn sample(&self, x: f64, y: f64, seed: usize) -> f64 {
+    fn sample<I: NoiseRange>(&self, x_range: I, y_range: I, seed: usize) -> Array1<f64> {
         let domain = self.domain();
         let start = domain.start();
         let end = domain.end();
-        end - self.0.sample(x, y, seed) + start
+        (*end + *start) - self.0.sample(x_range, y_range, seed)
     }
 
     fn domain(&self) -> RangeInclusive<f64> {
@@ -22,10 +25,6 @@ impl<N: Noise> std::ops::Not for NoiseSource<N> {
 
     #[inline]
     fn not(self) -> Self::Output {
-        let noise = NoiseNot(self.noise);
-        NoiseSource { 
-            domain: noise.domain(),
-            noise,
-        }
+        NoiseSource { noise: NoiseNot(self.noise) }
     }
 }

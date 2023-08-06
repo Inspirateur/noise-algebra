@@ -1,11 +1,14 @@
 use std::ops::RangeInclusive;
-use crate::noise::{Noise, NoiseSource};
+use ndarray::Array1;
+use crate::noise::{Noise, NoiseSource, NoiseRange};
+
+#[derive(Clone)]
 pub struct NoisePowi<L: Noise>(L, i32);
 
 impl<L: Noise> Noise for NoisePowi<L> {
     #[inline]
-    fn sample(&self, x: f64, y: f64, seed: usize) -> f64 {
-        self.0.sample(x, y, seed).powi(self.1)
+    fn sample<I: NoiseRange>(&self, x_range: I, y_range: I, seed: usize) -> Array1<f64> {
+        self.0.sample(x_range, y_range, seed).map(|v| v.powi(self.1))
     }
 
     fn domain(&self) -> RangeInclusive<f64> {
@@ -25,7 +28,6 @@ impl<L: Noise> Noise for NoisePowi<L> {
 
 impl<X: Noise> NoiseSource<X> {
     pub fn powi(self, i: i32) -> NoiseSource<impl Noise> {
-        let noise = NoisePowi(self.noise, i);
-        NoiseSource { domain: noise.domain(), noise }
+        NoiseSource { noise: NoisePowi(self.noise, i) }
     }
 }

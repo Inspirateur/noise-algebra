@@ -1,13 +1,16 @@
 use std::ops::RangeInclusive;
-use crate::noise::{Noise, NoiseSource};
+use ndarray::Array1;
 
-pub struct NoiseAdd<L: Noise, R: Noise>(L, R);
+use crate::noise::{Noise, NoiseSource, NoiseRange};
+
+#[derive(Clone)]
+pub struct NoiseAdd<L, R>(L, R);
 
 impl<L: Noise, R: Noise> Noise for NoiseAdd<L, R> {
     #[inline]
-    fn sample(&self, x: f64, y: f64, seed: usize) -> f64 {
-        self.0.sample(x, y, seed.wrapping_mul(2))
-            + self.1.sample(x, y, seed.wrapping_mul(2).wrapping_add(1))
+    fn sample<I: NoiseRange>(&self, x_range: I, y_range: I, seed: usize) -> Array1<f64> {
+        self.0.sample(x_range.clone(), y_range.clone(), seed.wrapping_mul(2))
+            + self.1.sample(x_range, y_range, seed.wrapping_mul(2).wrapping_add(1))
     }
 
     fn domain(&self) -> RangeInclusive<f64> {
@@ -17,29 +20,46 @@ impl<L: Noise, R: Noise> Noise for NoiseAdd<L, R> {
     }
 }
 
-impl<L: Noise, R: Noise> std::ops::Add<NoiseSource<R>> for NoiseSource<L> {
-    type Output = NoiseSource<NoiseAdd<L, R>>;
-
+impl<L: Noise> Noise for NoiseAdd<L, f64> {
     #[inline]
-    fn add(self, rhs: NoiseSource<R>) -> Self::Output {
-        let noise = NoiseAdd(self.noise, rhs.noise);
-        NoiseSource { 
-            domain: noise.domain(),
-            noise,
-        }
+    fn sample<I: NoiseRange>(&self, x_range: I, y_range: I, seed: usize) -> Array1<f64> {
+        self.0.sample(x_range.clone(), y_range.clone(), seed.wrapping_mul(2))
+            + self.1
+    }
+
+    fn domain(&self) -> RangeInclusive<f64> {
+        let ldomain = self.0.domain();
+        (ldomain.start()+self.1)..=(ldomain.end()+self.1)
     }
 }
 
-impl<L: Noise, R: Noise> std::ops::Add<R> for NoiseSource<L> {
+impl<R: Noise> Noise for NoiseAdd<f64, R> {
+    #[inline]
+    fn sample<I: NoiseRange>(&self, x_range: I, y_range: I, seed: usize) -> Array1<f64> {
+        self.0
+            + self.1.sample(x_range, y_range, seed.wrapping_mul(2).wrapping_add(1))
+    }
+
+    fn domain(&self) -> RangeInclusive<f64> {
+        let rdomain = self.1.domain();
+        (self.0+rdomain.start())..=(self.0+rdomain.end())
+    }
+}
+
+impl<L: Noise, R: Noise> std::ops::Add<NoiseSource<R>> for NoiseSource<L> {
     type Output = NoiseSource<NoiseAdd<L, R>>;
+    #[inline]
+    fn add(self, rhs: NoiseSource<R>) -> Self::Output {
+        NoiseSource { noise: NoiseAdd(self.noise, rhs.noise) }
+    }
+}
+
+impl<L: Noise> std::ops::Add<f64> for NoiseSource<L> {
+    type Output = NoiseSource<NoiseAdd<L, f64>>;
 
     #[inline]
-    fn add(self, rhs: R) -> Self::Output {
-        let noise = NoiseAdd(self.noise, rhs);
-        NoiseSource { 
-            domain: noise.domain(),
-            noise,
-        }
+    fn add(self, rhs: f64) -> Self::Output {
+        NoiseSource { noise: NoiseAdd(self.noise, rhs) }
     }
 }
 
@@ -48,10 +68,6 @@ impl<R: Noise> std::ops::Add<NoiseSource<R>> for f64 {
 
     #[inline]
     fn add(self, rhs: NoiseSource<R>) -> Self::Output {
-        let noise = NoiseAdd(self, rhs.noise);
-        NoiseSource { 
-            domain: noise.domain(),
-            noise,
-        }
+        NoiseSource { noise: NoiseAdd(self, rhs.noise) }
     }
 }

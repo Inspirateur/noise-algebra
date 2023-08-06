@@ -4,3 +4,6 @@ pub mod mul;
 pub mod powf;
 pub mod powi;
 pub mod not;
+pub mod norm;
+pub mod exp;
+pub mod mask;
