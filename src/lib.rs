@@ -3,7 +3,7 @@ mod algebra;
 mod sources;
 pub use crate::noise::{Noise, NoiseSource};
 pub use crate::sources::perlin;
-pub use crate::sources::simplex;
+pub use crate::sources::simd;
 pub use crate::sources::fake_noise;
 
 #[cfg(test)]

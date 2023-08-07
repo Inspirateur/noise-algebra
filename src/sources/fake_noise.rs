@@ -14,7 +14,7 @@ impl FakeNoise {
 
 impl Noise for FakeNoise {
     #[inline]
-    fn sample<R: NoiseRange>(&self, x_range: R, y_range: R, seed: usize) -> Array1<f64> {
+    fn sample<R: NoiseRange>(&self, x_range: R, y_range: R, _seed: usize) -> Array1<f64> {
         Array1::from_elem(x_range.len()*y_range.len(), self.value)
     }
 
