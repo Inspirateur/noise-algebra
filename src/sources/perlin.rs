@@ -3,7 +3,7 @@ use itertools::iproduct;
 use noise::Seedable;
 use ::noise::{NoiseFn, Perlin as PerlinImpl};
 use ndarray::Array1;
-const C: f64 = 3141.592653589793238462643383279502884197;
+use crate::sources::C;
 
 #[derive(Clone)]
 pub struct Perlin {

@@ -1,19 +1,22 @@
 mod noise;
 mod algebra;
-mod perlin;
-mod simplex;
+mod sources;
 pub use crate::noise::{Noise, NoiseSource};
-pub use crate::perlin::perlin;
-pub use crate::simplex::simplex;
-
+pub use crate::sources::perlin;
+pub use crate::sources::simplex;
+pub use crate::sources::fake_noise;
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    pub fn test_simd() {
-        let noise = perlin(1.);
-        println!("{}", noise.sample(0..8, 0..8, 1));
+    pub fn test_domain_output() {
+        let noise = !fake_noise(0.5) + fake_noise(0.5)*2f64 - fake_noise(0.5);
+        assert_eq!(noise.domain(), -4f64..=4f64);
+        let noise =  noise.normalize();
+        assert_eq!(noise.domain(), -1f64..=1f64);
+        let sample = noise.sample(0..1, 0..1, 0);
+        assert_eq!(sample[0], 0f64);
     }
 }
