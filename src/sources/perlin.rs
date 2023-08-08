@@ -47,6 +47,7 @@ impl Noise for Perlin {
     }
 }
 
+/// Uses the noise lib
 #[inline]
 pub fn perlin(freq: f64) -> NoiseSource<Perlin> {
     NoiseSource { noise: Perlin::new(freq) }

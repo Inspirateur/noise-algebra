@@ -29,6 +29,7 @@ impl Noise for FakeNoise {
     }
 }
 
+/// Always output the value you put in, for testing purposes
 #[inline]
 pub fn fake_noise(value: f64) -> NoiseSource<impl Noise> {
     NoiseSource { noise: FakeNoise::new(value) }

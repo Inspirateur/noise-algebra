@@ -7,3 +7,4 @@ pub mod not;
 pub mod norm;
 pub mod exp;
 pub mod mask;
+pub mod quantize;

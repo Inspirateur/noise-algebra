@@ -40,6 +40,7 @@ impl Noise for Simplex {
     }
 }
 
+/// Uses the simdnoise lib, subsequent operations are NOT simd (yet)
 pub fn simplex(freq: f32) -> NoiseSource<Simplex> {
     NoiseSource { noise: Simplex::new(freq) }
 }
