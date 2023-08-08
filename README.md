@@ -21,7 +21,7 @@ fn main() {
 }
 ```
 
-Designed for procedural generation, the API is focused on making noise building code easy to read and write while still being performant.  
+Designed for procedural generation, the API is focused on making noise building code easy to read and write while still being performant.
 
 *Big thanks to [Chris Janaqi](https://github.com/kokounet) for helping me with the implementation!*
 ## Benchmark
