@@ -22,7 +22,7 @@ fn main() {
 ```
 
 Designed for procedural generation, the API is focused on making noise building code easy to read and write while still being performant.
-
+Big thanks to [Chris Janaqi](https://github.com/kokounet) for helping me with the implementation!
 ## Benchmark
 The same noise function is constructed using simd::simplex (from [simdnoise](https://crates.io/crates/simdnoise)), perlin (from [noise-rs](https://crates.io/crates/noise)) and a fake-noise function that just outputs a constant. We evaluate the sample speed of these functions for a grid of 32x32 points.
 
