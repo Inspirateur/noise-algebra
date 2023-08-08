@@ -1,31 +1,38 @@
+use std::ops::RangeInclusive;
 use itertools::Itertools;
 use ndarray::Array1;
 use simdnoise::*;
-use crate::{Noise, NoiseSource, noise::NoiseRange};
+use crate::noise::len;
+use crate::{Noise, NoiseSource};
 use crate::sources::C;
 
 #[derive(Clone)]
 pub struct Simplex {
-    freq: f64
+    freq: f32
 }
 
 
 impl Simplex {
-    fn new(freq: f64) -> Self {
+    fn new(freq: f32) -> Self {
         Self { freq }
     }
 }
 
 impl Noise for Simplex {
     #[inline]
-    fn sample<R: NoiseRange>(&self, mut x_range: R, mut y_range: R, seed: usize) -> Array1<f64> {
-        let x = x_range.next().unwrap_or(0);
-        let y = y_range.next().unwrap_or(0);
-        let (res, _, _) = NoiseBuilder::fbm_2d_offset(
-            self.freq as f32*x as f32/C as f32, x_range.len(), 
-            self.freq as f32*y as f32/C as f32, y_range.len()
-        ).with_seed(seed as i32).generate();
-        Array1::from_vec(res.into_iter().map(|v| v as f64).collect_vec())
+    fn sample<const D: usize>(&self, ranges: [RangeInclusive<i32>; D], step_by: usize, seed: usize) -> Array1<f64> {
+        match D {
+            2 => {
+                let x_start = *ranges[0].start();
+                let y_start = *ranges[1].start();
+                let (res, _, _) = NoiseBuilder::fbm_2d_offset(
+                    x_start as f32/C as f32, len(ranges[0].clone(), step_by), 
+                    y_start as f32/C as f32, len(ranges[1].clone(), step_by)
+                ).with_freq(self.freq * step_by as f32).with_seed(seed as i32).generate();
+                Array1::from_vec(res.into_iter().map(|v| v as f64).collect_vec())        
+            },
+            _ => todo!()
+        }
     }
 
     fn domain(&self) -> std::ops::RangeInclusive<f64> {
@@ -33,6 +40,6 @@ impl Noise for Simplex {
     }
 }
 
-pub fn simplex(freq: f64) -> NoiseSource<Simplex> {
+pub fn simplex(freq: f32) -> NoiseSource<Simplex> {
     NoiseSource { noise: Simplex::new(freq) }
 }

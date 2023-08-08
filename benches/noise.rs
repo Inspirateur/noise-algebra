@@ -1,10 +1,11 @@
-use std::ops::Range;
+use std::ops::RangeInclusive;
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use noise_algebra::{NoiseSource, Noise, perlin, simd::simplex, fake_noise};
 const SIZE: i32 = 32;
+const UP_TO: i32 = SIZE-1;
 
-fn generate<X: Noise>(noise: NoiseSource<X>, x_range: Range<i32>, y_range: Range<i32>) {
-    let _ = noise.sample(x_range, y_range, 42);
+fn generate<const D: usize, X: Noise>(noise: NoiseSource<X>, ranges: [RangeInclusive<i32>; D]) {
+    let _ = noise.sample(ranges, 1, 42);
 }
 
 fn const_bench(c: &mut Criterion) {
@@ -14,8 +15,10 @@ fn const_bench(c: &mut Criterion) {
     let mount_mask = (fake_noise(1.) + fake_noise(2.)*0.3).normalize().mask(0.2)*land.clone();
     let mount = (!(fake_noise(0.8).powi(2)) + fake_noise(1.5).powi(2)*0.4).normalize() * mount_mask;
     let y = 0.009 + land*0.3 + mount*(1.-0.3);
-    c.bench_function(&format!("const-generate-{}^2", SIZE), |b| b.iter(|| generate(
-        black_box(y.clone()), black_box(0..SIZE), black_box(0..SIZE)
+    // the ranges to sample
+    let ranges = [0..=UP_TO, 0..=UP_TO];
+    c.bench_function(&format!("const-generate-{}^{}", SIZE, ranges.len()), |b| b.iter(|| generate(
+        black_box(y.clone()), black_box(ranges.clone())
     )));
 }
 
@@ -26,8 +29,10 @@ fn perlin_bench(c: &mut Criterion) {
     let mount_mask = (perlin(1.) + perlin(2.)*0.3).normalize().mask(0.2)*land.clone();
     let mount = (!(perlin(0.8).powi(2)) + perlin(1.5).powi(2)*0.4).normalize() * mount_mask;
     let y = 0.009 + land*0.3 + mount*(1.-0.3);
-    c.bench_function(&format!("perlin-generate-{}^2", SIZE), |b| b.iter(|| generate(
-        black_box(y.clone()), black_box(0..SIZE), black_box(0..SIZE)
+    // the ranges to sample
+    let ranges = [0..=UP_TO, 0..=UP_TO];
+    c.bench_function(&format!("perlin-generate-{}^{}", SIZE, ranges.len()), |b| b.iter(|| generate(
+        black_box(y.clone()), black_box(ranges.clone())
     )));
 }
 
@@ -38,10 +43,13 @@ fn simd_bench(c: &mut Criterion) {
     let mount_mask = (simplex(1.) + simplex(2.)*0.3).normalize().mask(0.2)*land.clone();
     let mount = (!(simplex(0.8).powi(2)) + simplex(1.5).powi(2)*0.4).normalize() * mount_mask;
     let y = 0.009 + land*0.3 + mount*(1.-0.3);
-    c.bench_function(&format!("simd-generate-{}^2", SIZE), |b| b.iter(|| generate(
-        black_box(y.clone()), black_box(0..SIZE), black_box(0..SIZE)
+    // the ranges to sample
+    let ranges = [0..=UP_TO, 0..=UP_TO];
+    c.bench_function(&format!("simd-generate-{}^{}", SIZE, ranges.len()), |b| b.iter(|| generate(
+        black_box(y.clone()), black_box(ranges.clone())
     )));
 }
+
 
 criterion_group!(noise, const_bench, perlin_bench, simd_bench);
 criterion_main!(noise);

@@ -1,4 +1,5 @@
-use crate::noise::{Noise, NoiseSource, NoiseRange};
+use std::ops::RangeInclusive;
+use crate::noise::{Noise, NoiseSource, len};
 use itertools::iproduct;
 use noise::Seedable;
 use ::noise::{NoiseFn, Perlin as PerlinImpl};
@@ -22,16 +23,23 @@ impl Perlin {
 
 impl Noise for Perlin {
     #[inline]
-    fn sample<R: NoiseRange>(&self, x_range: R, y_range: R, seed: usize) -> Array1<f64> {
-        let source = self.source.set_seed(seed as u32);
-        let mut res = Array1::from_elem(x_range.len()*y_range.len(), 0f64);
-        for (i, (x, y)) in iproduct!(x_range, y_range).enumerate() {
-            res[i] = source.get([
-                self.freq * (x as f64)/C, 
-                self.freq * (y as f64)/C
-            ])
+    fn sample<const D: usize>(&self, ranges: [RangeInclusive<i32>; D], step_by: usize, seed: usize) -> Array1<f64> {
+        match D {
+            2 => {
+                let source = self.source.set_seed(seed as u32);
+                let mut res = Array1::from_elem(
+                    len(ranges[0].clone(), step_by)*len(ranges[1].clone(), step_by), 0f64
+                );
+                for (i, (x, y)) in iproduct!(ranges[0].clone().step_by(step_by), ranges[1].clone().step_by(step_by)).enumerate() {
+                    res[i] = source.get([
+                        self.freq * (x as f64)/C, 
+                        self.freq * (y as f64)/C
+                    ])
+                }
+                res
+            },
+            _ => todo!()
         }
-        res
     }
 
     fn domain(&self) -> std::ops::RangeInclusive<f64> {

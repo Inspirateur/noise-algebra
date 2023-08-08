@@ -1,5 +1,5 @@
 use std::ops::RangeInclusive;
-use crate::noise::{Noise, NoiseSource, NoiseRange};
+use crate::noise::{Noise, NoiseSource};
 use ndarray::Array1;
 
 #[derive(Clone)]
@@ -7,8 +7,8 @@ pub struct NoisePowf<L: Noise>(L, f64);
 
 impl<L: Noise> Noise for NoisePowf<L> {
     #[inline]
-    fn sample<I: NoiseRange>(&self, x_range: I, y_range: I, seed: usize) -> Array1<f64> {
-        let res = self.0.sample(x_range, y_range, seed);
+    fn sample<const D: usize>(&self, ranges: [RangeInclusive<i32>; D], steb_by: usize, seed: usize) -> Array1<f64> {
+        let res = self.0.sample(ranges, steb_by, seed);
         res.map(|v| v.signum()*v.abs().powf(self.1))
     }
 
@@ -23,6 +23,7 @@ impl<L: Noise> Noise for NoisePowf<L> {
 }
 
 impl<X: Noise> NoiseSource<X> {
+    #[inline]
     pub fn powf(self, f: f64) -> NoiseSource<impl Noise> {
         NoiseSource { noise: NoisePowf(self.noise, f) }
     }

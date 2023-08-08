@@ -1,16 +1,15 @@
 use std::ops::RangeInclusive;
 use ndarray::Array1;
-
-use crate::noise::{Noise, NoiseSource, NoiseRange};
+use crate::noise::{Noise, NoiseSource};
 
 #[derive(Clone)]
 pub struct NoiseAdd<L, R>(L, R);
 
 impl<L: Noise, R: Noise> Noise for NoiseAdd<L, R> {
     #[inline]
-    fn sample<I: NoiseRange>(&self, x_range: I, y_range: I, seed: usize) -> Array1<f64> {
-        self.0.sample(x_range.clone(), y_range.clone(), seed.wrapping_mul(2))
-            + self.1.sample(x_range, y_range, seed.wrapping_mul(2).wrapping_add(1))
+    fn sample<const D: usize>(&self, ranges: [RangeInclusive<i32>; D], step_by: usize, seed: usize) -> Array1<f64> {
+        self.0.sample(ranges.clone(), step_by, seed.wrapping_mul(2))
+            + self.1.sample(ranges, step_by, seed.wrapping_mul(2).wrapping_add(1))
     }
 
     fn domain(&self) -> RangeInclusive<f64> {
@@ -22,8 +21,8 @@ impl<L: Noise, R: Noise> Noise for NoiseAdd<L, R> {
 
 impl<L: Noise> Noise for NoiseAdd<L, f64> {
     #[inline]
-    fn sample<I: NoiseRange>(&self, x_range: I, y_range: I, seed: usize) -> Array1<f64> {
-        self.0.sample(x_range.clone(), y_range.clone(), seed.wrapping_mul(2))
+    fn sample<const D: usize>(&self, ranges: [RangeInclusive<i32>; D], step_by: usize, seed: usize) -> Array1<f64> {
+        self.0.sample(ranges, step_by, seed)
             + self.1
     }
 
@@ -35,9 +34,9 @@ impl<L: Noise> Noise for NoiseAdd<L, f64> {
 
 impl<R: Noise> Noise for NoiseAdd<f64, R> {
     #[inline]
-    fn sample<I: NoiseRange>(&self, x_range: I, y_range: I, seed: usize) -> Array1<f64> {
+    fn sample<const D: usize>(&self, ranges: [RangeInclusive<i32>; D], step_by: usize, seed: usize) -> Array1<f64> {
         self.0
-            + self.1.sample(x_range, y_range, seed.wrapping_mul(2).wrapping_add(1))
+            + self.1.sample(ranges, step_by, seed)
     }
 
     fn domain(&self) -> RangeInclusive<f64> {

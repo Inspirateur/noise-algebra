@@ -1,13 +1,14 @@
 use std::ops::RangeInclusive;
 use ndarray::Array1;
 
-pub trait NoiseRange: ExactSizeIterator<Item = i32> + Clone {}
-impl<R: ExactSizeIterator<Item = i32> + Clone> NoiseRange for R {}
-
 pub trait Noise: Clone {
-    fn sample<R: NoiseRange>(&self, x_range: R, y_range: R, seed: usize) -> Array1<f64>;
+    fn sample<const D: usize>(&self, ranges: [RangeInclusive<i32>; D], step_by: usize, seed: usize) -> Array1<f64>;
 
     fn domain(&self) -> RangeInclusive<f64>;
+}
+
+pub(crate) fn len(range: RangeInclusive<i32>, step_by: usize) -> usize {
+    1 + (range.end() - range.start()) as usize/step_by
 }
 
 #[derive(Clone)]

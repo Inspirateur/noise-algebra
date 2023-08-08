@@ -8,6 +8,7 @@ pub use crate::sources::fake_noise;
 
 #[cfg(test)]
 mod tests {
+    use crate::simd::simplex;
     use super::*;
 
     #[test]
@@ -16,7 +17,16 @@ mod tests {
         assert_eq!(noise.domain(), -4f64..=4f64);
         let noise =  noise.normalize();
         assert_eq!(noise.domain(), -1f64..=1f64);
-        let sample = noise.sample(0..1, 0..1, 0);
+        let sample = noise.sample([0..=1, 0..=1], 1, 0);
         assert_eq!(sample[0], 0f64);
+    }
+
+    #[test]
+    pub fn consistent_len() {
+        let noise = fake_noise(0.5) + perlin(0.5) + simplex(0.5);
+        let sample = noise.sample(
+            [0..=31, 0..=31], 2, 0
+        );
+        println!("{}", sample);
     }
 }
