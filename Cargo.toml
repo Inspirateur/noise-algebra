@@ -1,6 +1,6 @@
 [package]
 name = "noise-algebra"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "Easy manipulation of noise functions"
 repository = "https://github.com/Inspirateur/noise-algebra"
