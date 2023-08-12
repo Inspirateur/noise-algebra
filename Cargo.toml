@@ -2,6 +2,7 @@
 name = "noise-algebra"
 version = "0.1.1"
 edition = "2021"
+license = "Unlicense"
 description = "Easy manipulation of noise functions"
 repository = "https://github.com/Inspirateur/noise-algebra"
 keywords = ["noise", "procedural", "generation", "simplex", "perlin"]
