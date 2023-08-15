@@ -1,7 +1,7 @@
 use std::ops::RangeInclusive;
 use ndarray::Array1;
 
-pub trait Noise: Clone + Send + Sync + Sized {
+pub trait Noise: Clone + Send + Sync {
     /// Sample the noise at a range of coordinates, with the specified step and seed
     /// the output is an unrolled array with samples for every combination of coordinates
     /// each range produces 1+(end-start)/step_by values, the length of the output array is the product of that for every range

@@ -12,6 +12,11 @@ mod tests {
     use super::*;
 
     #[test]
+    pub fn box_test() {
+        let himcook: Box<dyn Noise> = Box::new(fake_noise(0.5) + fake_noise(0.2));
+    }
+
+    #[test]
     pub fn test_domain_output() {
         let noise = !fake_noise(0.5) + fake_noise(0.5)*2f64 - fake_noise(0.5);
         assert_eq!(noise.domain(), -4f64..=4f64);
