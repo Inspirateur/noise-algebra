@@ -1,30 +1,16 @@
-use std::ops::RangeInclusive;
-use ndarray::Array1;
+use std::ops::{Not, Add, Sub};
+use crate::Signal;
 
-use crate::noise::{Noise, NoiseSource};
+impl<N> Not for Signal<N>
+    where N: Add<N, Output = N>,
+    f64: Sub<N, Output = N>
+{
+    type Output = Signal<N>;
 
-#[derive(Clone)]
-pub struct NoiseNot<N: Noise>(N);
-
-impl<N: Noise> Noise for NoiseNot<N> {
-    #[inline]
-    fn sample<const D: usize>(&self, ranges: [RangeInclusive<i32>; D], steb_by: usize, seed: usize) -> Array1<f64> {
-        let domain = self.domain();
-        let start = domain.start();
-        let end = domain.end();
-        (*end + *start) - self.0.sample(ranges, steb_by, seed)
-    }
-
-    fn domain(&self) -> RangeInclusive<f64> {
-        self.0.domain()
-    }
-}
-
-impl<N: Noise> std::ops::Not for NoiseSource<N> {
-    type Output = NoiseSource<NoiseNot<N>>;
-
-    #[inline]
     fn not(self) -> Self::Output {
-        NoiseSource { noise: NoiseNot(self.noise) }
+        Signal {
+            value: self.domain.start()+self.domain.end() - self.value,
+            domain: self.domain
+        }
     }
 }

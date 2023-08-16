@@ -1,35 +1,59 @@
 use std::ops::RangeInclusive;
+use itertools::Itertools;
 use ndarray::Array1;
+use simdnoise::NoiseBuilder;
 
-pub trait Noise: Clone + Send + Sync {
-    /// Sample the noise at a range of coordinates, with the specified step and seed
-    /// the output is an unrolled array with samples for every combination of coordinates
-    /// each range produces 1+(end-start)/step_by values, the length of the output array is the product of that for every range
-    ///  
-    /// Supports dimensions 1, 2, 3, 4
-    /// 
-    /// Note: Noise sample coordinates are usually in [0; 1] 
-    /// but for convenience this method asks for i32 and scales them back to make it work 
-    fn sample<const D: usize>(&self, ranges: [RangeInclusive<i32>; D], step_by: usize, seed: usize) -> Array1<f64>;
+use crate::Signal;
+const C: f32 = 3.14159265359;
 
-    fn domain(&self) -> RangeInclusive<f64>;
-}
-
-pub(crate) fn len(range: RangeInclusive<i32>, step_by: usize) -> usize {
+fn len(range: RangeInclusive<i32>, step_by: usize) -> usize {
     1 + (range.end() - range.start()) as usize/step_by
 }
 
-#[derive(Clone)]
-pub struct NoiseSource<X: Noise> {
-    pub noise: X
+pub struct NoiseSource<const D: usize> {
+    seed: i32,
+    offsets: [f32; D],
+    lens: [usize; D],
+    step_by: usize
 }
 
+impl<const D: usize> NoiseSource<D> {
+    pub fn new(area: [RangeInclusive<i32>; D], seed: i32, step_by: usize) -> Self {
+        NoiseSource { 
+            offsets: area.clone().map(|range| *range.start() as f32/C as f32),
+            lens: area.map(|range| len(range, step_by)),
+            seed, 
+            step_by 
+        }
+    }
 
-impl<X: Noise> std::ops::Deref for NoiseSource<X> {
-    type Target = X;
+    pub fn simplex(&mut self, freq: f32) -> Signal<Array1<f64>> {
+        self.seed += 1;
+        Signal {
+            value: match D {
+                2 => {
+                    let (res, _, _) = NoiseBuilder::fbm_2d_offset(
+                        self.offsets[0], self.lens[0], 
+                        self.offsets[1], self.lens[1]
+                    ).with_freq(freq * self.step_by as f32).with_seed(self.seed as i32).generate();
+                    Array1::from_vec(res.into_iter().map(|v| v as f64).collect_vec())        
+                },
+                _ => todo!()
+            },
+            domain: -1f64..=1f64
+        }
 
-    #[inline]
-    fn deref(&self) -> &Self::Target {
-        &self.noise
+    }
+
+    pub fn constant(&self, value: f64) -> Signal<Array1<f64>> {
+        Signal {
+            value: Array1::from_elem(
+                self.lens.iter()
+                    .fold(1, |a, b| a*b), 
+                value
+            ),
+            domain: -1f64..=1f64
+        }
+
     }
 }

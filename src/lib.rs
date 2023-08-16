@@ -1,37 +1,16 @@
 mod noise;
 mod algebra;
-mod sources;
-pub use crate::noise::{Noise, NoiseSource};
-pub use crate::sources::perlin;
-pub use crate::sources::simd;
-pub use crate::sources::fake_noise;
+pub use crate::noise::NoiseSource;
+use std::ops::RangeInclusive;
+
+#[derive(Clone)]
+pub struct Signal<N> {
+    pub(crate) value: N,
+    pub(crate) domain: RangeInclusive<f64>
+}
+
 
 #[cfg(test)]
 mod tests {
-    use crate::simd::simplex;
     use super::*;
-
-    #[test]
-    pub fn box_test() {
-        let himcook: Box<dyn Noise> = Box::new(fake_noise(0.5) + fake_noise(0.2));
-    }
-
-    #[test]
-    pub fn test_domain_output() {
-        let noise = !fake_noise(0.5) + fake_noise(0.5)*2f64 - fake_noise(0.5);
-        assert_eq!(noise.domain(), -4f64..=4f64);
-        let noise =  noise.normalize();
-        assert_eq!(noise.domain(), -1f64..=1f64);
-        let sample = noise.sample([0..=1, 0..=1], 1, 0);
-        assert_eq!(sample[0], 0f64);
-    }
-
-    #[test]
-    pub fn consistent_len() {
-        let noise = fake_noise(0.5) + perlin(0.5) + simplex(0.5);
-        let sample = noise.sample(
-            [0..=31, 0..=31], 2, 0
-        );
-        println!("{}", sample);
-    }
 }

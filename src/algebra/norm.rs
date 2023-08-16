@@ -1,30 +1,12 @@
-use std::ops::RangeInclusive;
-use ndarray::Array1;
-use crate::noise::{Noise, NoiseSource};
+use std::ops::Div;
+use crate::Signal;
 
-#[derive(Clone)]
-pub struct NoiseNorm<N: Noise>(N, f64);
 
-impl<N: Noise> Noise for NoiseNorm<N> {
-    #[inline]
-    fn sample<const D: usize>(&self, ranges: [RangeInclusive<i32>; D], steb_by: usize, seed: usize) -> Array1<f64> {
-        // assumes a domain of type [-x; x] or [0; x] with x non-zero
-        self.0.sample(ranges, steb_by, seed)/self.1
-    }
-
-    fn domain(&self) -> RangeInclusive<f64> {
-        let domain = self.0.domain();
-        domain.start()/domain.end()..=1.
-    }
-}
-
-impl<X: Noise> NoiseSource<X> {
-    #[inline]
-    pub fn normalize(self) -> NoiseSource<impl Noise> {
-        let mut ampl = *(self.noise.domain().end());
-        if ampl == 0. {
-            ampl = 1.;
+impl<N: Div<f64, Output = N>> Signal<N> {
+    pub fn normalize(self) -> Self {
+        Signal { 
+            value: self.value/(*self.domain.end()), 
+            domain: self.domain.start()/self.domain.end()..=1.
         }
-        NoiseSource { noise: NoiseNorm(self.noise, ampl) }
     }
 }
