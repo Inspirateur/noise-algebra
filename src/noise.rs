@@ -10,6 +10,7 @@ fn len(range: RangeInclusive<i32>, step_by: usize) -> usize {
     1 + (range.end() - range.start()) as usize/step_by
 }
 
+#[derive(Clone)]
 pub struct NoiseSource<const D: usize> {
     seed: i32,
     offsets: [f32; D],
@@ -45,7 +46,7 @@ impl<const D: usize> NoiseSource<D> {
 
     }
 
-    pub fn constant(&self, value: f64) -> Signal<Array1<f64>> {
+    pub fn constant(&mut self, value: f64) -> Signal<Array1<f64>> {
         Signal {
             value: Array1::from_elem(
                 self.lens.iter()
