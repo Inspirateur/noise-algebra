@@ -2,9 +2,10 @@ use std::ops::RangeInclusive;
 use itertools::Itertools;
 use ndarray::Array1;
 use simdnoise::NoiseBuilder;
-
 use crate::Signal;
+// empirical values to make the output nicer with default inputs
 const C: f32 = 1.;
+const FREQ_C: f32 = 0.005;
 
 fn len(range: RangeInclusive<i32>, step_by: usize) -> usize {
     1 + (range.end() - range.start()) as usize/step_by
@@ -38,7 +39,7 @@ impl<const D: usize> NoiseSource<D> {
                     let (res, _, _) = NoiseBuilder::gradient_2d_offset(
                         self.offsets[0], self.lens[0], 
                         self.offsets[1], self.lens[1]
-                    ).with_freq(freq * self.step_by as f32).with_seed(self.seed as i32).generate();
+                    ).with_freq(FREQ_C * freq * self.step_by as f32).with_seed(self.seed as i32).generate();
                     Array1::from_vec(res.into_iter().map(|v| v as f64).collect_vec())*46.     
                 },
                 _ => todo!()
