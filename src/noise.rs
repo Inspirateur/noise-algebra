@@ -4,7 +4,7 @@ use ndarray::Array1;
 use simdnoise::NoiseBuilder;
 
 use crate::Signal;
-const C: f32 = 3.14159265359;
+const C: f32 = 1.;
 
 fn len(range: RangeInclusive<i32>, step_by: usize) -> usize {
     1 + (range.end() - range.start()) as usize/step_by
@@ -33,17 +33,18 @@ impl<const D: usize> NoiseSource<D> {
         Signal {
             value: match D {
                 2 => {
-                    let (res, _, _) = NoiseBuilder::fbm_2d_offset(
+                    // *46 is due to a manual scaling required because library oversight 
+                    // https://github.com/verpeteren/rust-simd-noise/issues/23
+                    let (res, _, _) = NoiseBuilder::gradient_2d_offset(
                         self.offsets[0], self.lens[0], 
                         self.offsets[1], self.lens[1]
                     ).with_freq(freq * self.step_by as f32).with_seed(self.seed as i32).generate();
-                    Array1::from_vec(res.into_iter().map(|v| v as f64).collect_vec())        
+                    Array1::from_vec(res.into_iter().map(|v| v as f64).collect_vec())*46.     
                 },
                 _ => todo!()
             },
             domain: -1f64..=1f64
         }
-
     }
 
     pub fn constant(&mut self, value: f64) -> Signal<Array1<f64>> {
