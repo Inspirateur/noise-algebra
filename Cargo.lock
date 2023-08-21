@@ -403,7 +403,7 @@ dependencies = [
 
 [[package]]
 name = "noise-algebra"
-version = "0.1.5"
+version = "0.1.6"
 dependencies = [
  "bracket-noise",
  "criterion",

@@ -5,7 +5,7 @@ use simdnoise::NoiseBuilder;
 use crate::Signal;
 // empirical values to make the output nicer with default inputs
 const C: f32 = 1.;
-const FREQ_C: f32 = 0.005;
+const FREQ_C: f32 = 0.001;
 
 fn len(range: RangeInclusive<i32>, step_by: usize) -> usize {
     1 + (range.end() - range.start()) as usize/step_by
