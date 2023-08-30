@@ -10,3 +10,12 @@ impl Signal<Array1<f32>> {
         }
     }
 }
+
+impl Signal<Array1<f64>> {
+    pub fn exp(self) -> Self {
+        Signal { 
+            value: self.value.map(|v| v.exp()), 
+            domain: self.domain.start().exp()..=self.domain.end().exp()
+        }
+    }
+}
