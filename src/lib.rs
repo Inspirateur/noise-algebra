@@ -6,7 +6,7 @@ use std::ops::{RangeInclusive, Deref};
 #[derive(Clone, Debug)]
 pub struct Signal<N> {
     pub(crate) value: N,
-    pub(crate) domain: RangeInclusive<f64>
+    pub domain: RangeInclusive<f64>
 }
 
 impl<N> Deref for Signal<N> {
