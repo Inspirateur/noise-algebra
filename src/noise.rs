@@ -22,7 +22,7 @@ pub struct NoiseSource<const D: usize> {
 impl<const D: usize> NoiseSource<D> {
     pub fn new(area: [RangeInclusive<i32>; D], seed: i32, step_by: usize) -> Self {
         NoiseSource { 
-            offsets: area.clone().map(|range| *range.start() as f32/C as f32),
+            offsets: area.clone().map(|range| (range.start()/step_by as i32) as f32/C as f32),
             lens: area.map(|range| len(range, step_by)),
             seed, 
             step_by 
