@@ -1,12 +1,12 @@
 use crate::Signal;
-use ndarray::Array1;
+use ndarray::{Array, Dimension};
 
-impl Signal<Array1<f64>> {
-    pub fn mask(self, t: f64) -> Self {
+impl<D: Dimension> Signal<Array<f32, D>> {
+    pub fn mask(self, t: f32) -> Self {
         let t = 1. - 2.*t;
         Signal { 
             value: 1.0 / (1.0 + (-16. * (self.value - t)).map(|v| v.exp())), 
-            domain: 0f64..=1f64
+            domain: 0f32..=1f32
         }
     }
 }

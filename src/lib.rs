@@ -6,7 +6,7 @@ use std::ops::{RangeInclusive, Deref};
 #[derive(Clone, Debug)]
 pub struct Signal<N> {
     pub(crate) value: N,
-    pub domain: RangeInclusive<f64>
+    pub domain: RangeInclusive<f32>
 }
 
 impl<N> Deref for Signal<N> {
@@ -27,7 +27,7 @@ mod tests {
         let mut n = NoiseSource::new([0..=31, 0..=31], 10, 1);
         let sample = n.simplex(1.);
         let (min, max) = sample.value.iter().fold(
-            (f64::INFINITY, f64::NEG_INFINITY), 
+            (f32::INFINITY, f32::NEG_INFINITY), 
             |(min, max), value| (min.min(*value), max.max(*value))
         );
         println!("{:?}", sample.value);

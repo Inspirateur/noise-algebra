@@ -3,7 +3,7 @@ use crate::Signal;
 
 impl<N> Not for Signal<N>
     where N: Add<N, Output = N>,
-    f64: Sub<N, Output = N>
+    f32: Sub<N, Output = N>
 {
     type Output = Signal<N>;
 

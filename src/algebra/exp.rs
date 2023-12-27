@@ -1,17 +1,8 @@
-use ndarray::Array1;
+use ndarray::{Array, Dimension};
 use crate::Signal;
 
 
-impl Signal<Array1<f32>> {
-    pub fn exp(self) -> Self {
-        Signal { 
-            value: self.value.map(|v| v.exp()), 
-            domain: self.domain.start().exp()..=self.domain.end().exp()
-        }
-    }
-}
-
-impl Signal<Array1<f64>> {
+impl<D: Dimension> Signal<Array<f32, D>> {
     pub fn exp(self) -> Self {
         Signal { 
             value: self.value.map(|v| v.exp()), 

@@ -10,3 +10,5 @@ pub mod exp;
 pub mod mask;
 pub mod quantize;
 pub mod pos;
+pub mod grad;
+pub mod erode;

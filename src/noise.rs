@@ -1,6 +1,6 @@
 use std::ops::RangeInclusive;
 use itertools::Itertools;
-use ndarray::Array1;
+use ndarray::Array2;
 use simdnoise::NoiseBuilder;
 use crate::Signal;
 // empirical values to make the output nicer with default inputs
@@ -19,8 +19,8 @@ pub struct NoiseSource<const D: usize> {
     step_by: usize
 }
 
-impl<const D: usize> NoiseSource<D> {
-    pub fn new(area: [RangeInclusive<i32>; D], seed: i32, step_by: usize) -> Self {
+impl NoiseSource<2> {
+    pub fn new(area: [RangeInclusive<i32>; 2], seed: i32, step_by: usize) -> Self {
         NoiseSource { 
             offsets: area.clone().map(|range| (range.start()/step_by as i32) as f32/C as f32),
             lens: area.map(|range| len(range, step_by)),
@@ -29,34 +29,38 @@ impl<const D: usize> NoiseSource<D> {
         }
     }
 
-    pub fn simplex(&mut self, freq: f32) -> Signal<Array1<f64>> {
+    pub fn simplex(&mut self, freq: f32) -> Signal<Array2<f32>> {
         self.seed += 1;
         Signal {
-            value: match D {
-                2 => {
-                    // *46 is due to a manual scaling required because library oversight 
-                    // https://github.com/verpeteren/rust-simd-noise/issues/23
-                    let (res, _, _) = NoiseBuilder::gradient_2d_offset(
-                        self.offsets[0], self.lens[0], 
-                        self.offsets[1], self.lens[1]
-                    ).with_freq(FREQ_C * freq * self.step_by as f32).with_seed(self.seed as i32).generate();
-                    Array1::from_vec(res.into_iter().map(|v| v as f64).collect_vec())*46.     
-                },
-                _ => todo!()
+            value: {
+                // *46 is due to a manual scaling required because library oversight 
+                // https://github.com/verpeteren/rust-simd-noise/issues/23
+                let (res, _, _) = NoiseBuilder::gradient_2d_offset(
+                    self.offsets[0], self.lens[0], 
+                    self.offsets[1], self.lens[1]
+                ).with_freq(FREQ_C * freq * self.step_by as f32).with_seed(self.seed as i32).generate();
+                Array2::from_shape_vec(
+                    (self.lens[0], self.lens[1]), 
+                    res.into_iter().map(|v| v).collect_vec()
+                ).unwrap()*46.
             },
-            domain: -1f64..=1f64
+            domain: -1f32..=1f32
         }
     }
 
-    pub fn constant(&mut self, value: f64) -> Signal<Array1<f64>> {
-        Signal {
-            value: Array1::from_elem(
-                self.lens.iter()
-                    .fold(1, |a, b| a*b), 
-                value
-            ),
-            domain: -1f64..=1f64
-        }
+    pub fn gavoronoise(&mut self, freq: f32) -> Signal<Array2<f32>> {
+        // TODO: https://www.shadertoy.com/view/llsGWl
+        todo!()
+    }
 
+    pub fn constant(&mut self, value: f32) -> Signal<Array2<f32>> {
+        Signal {
+            value: Array2::from_shape_vec(
+                (self.lens[0], self.lens[1]),
+                vec![value; self.lens.iter()
+                    .fold(1, |a, b| a*b)], 
+            ).unwrap(),
+            domain: -1f32..=1f32
+        }
     }
 }

@@ -1,8 +1,8 @@
 use crate::Signal;
-use ndarray::Array1;
+use ndarray::{Dimension, Array};
 
-impl Signal<Array1<f64>> {
-    pub fn powf(self, f: f64) -> Self {
+impl<D: Dimension> Signal<Array<f32, D>> {
+    pub fn powf(self, f: f32) -> Self {
         let start = self.domain.start();
         let end = self.domain.end();
         let min = start.signum()*start.abs().powf(f);

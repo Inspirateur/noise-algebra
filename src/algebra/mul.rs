@@ -22,12 +22,12 @@ impl<N> Mul<Signal<N>> for Signal<N>
     }
 }
 
-impl<N> Mul<f64> for Signal<N>
-    where N: Mul<f64, Output = N> 
+impl<N> Mul<f32> for Signal<N>
+    where N: Mul<f32, Output = N> 
 {
     type Output = Signal<N>;
 
-    fn mul(self, rhs: f64) -> Self::Output {
+    fn mul(self, rhs: f32) -> Self::Output {
         let p1 = self.domain.start()*rhs;
         let p2 = self.domain.end()*rhs;
         let min = p1.min(p2);
@@ -39,9 +39,9 @@ impl<N> Mul<f64> for Signal<N>
     }
 }
 
-impl<N, __> Mul<Signal<N>> for f64
-    where f64: Mul<N, Output = N>,
-    f64: Mul<__>,
+impl<N, __> Mul<Signal<N>> for f32
+    where f32: Mul<N, Output = N>,
+    f32: Mul<__>,
     N: IsSame<This = __>,
 {
     type Output = Signal<N>;
