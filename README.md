@@ -31,8 +31,8 @@ We evaluate the sample speed of these functions for a grid of 32x32 points.
 
 Results on my Intel(R) Xeon(R) CPU E5-1650 v3 (3.50GHz):
 ```
-simplex-generate-32^2      time:   [248.63 µs 249.30 µs 250.13 µs]
-const-generate-32^2     time:   [105.74 µs 107.16 µs 108.70 µs]
+simplex-generate-32^2      time:   [93.603 µs 94.057 µs 94.697 µs]
+const-generate-32^2     time:   [42.411 µs 43.501 µs 44.717 µs]
 ```
 
 The current performances could be better, simd is not yet used for operations applied on the noises. 
