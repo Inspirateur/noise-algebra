@@ -11,7 +11,7 @@ impl<D: Dimension> Signal<Array<f32, D>> {
             self.domain.start().powi(i)
         };
         Signal { 
-            value: self.value.map(|v| v.signum()*v.abs().powi(i)), 
+            value: self.value.map(|v| v.powi(i)), 
             domain: min..=max
         }
     }
