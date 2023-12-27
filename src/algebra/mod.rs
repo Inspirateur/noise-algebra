@@ -7,7 +7,7 @@ pub mod powi;
 pub mod not;
 pub mod norm;
 pub mod exp;
-pub mod mask;
+pub mod threshold;
 pub mod quantize;
 pub mod pos;
 pub mod grad;
