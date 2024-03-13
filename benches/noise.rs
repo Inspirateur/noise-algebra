@@ -5,16 +5,16 @@ const UP_TO: i32 = SIZE-1;
 
 fn generate_const(mut n: NoiseSource<2>) {
     let cont = (n.constant(0.7) + n.constant(3.) * 0.3).normalize();
-    let land = (cont.clone() + n.constant(9.) * 0.1).normalize().threshold(0.35);
-    let mount_mask = (n.constant(1.) + n.constant(2.)*0.3).normalize().threshold(0.2)*land.clone();
+    let land = (&cont + n.constant(9.) * 0.1).normalize().threshold(0.35);
+    let mount_mask = (n.constant(1.) + n.constant(2.)*0.3).normalize().threshold(0.2) * &land;
     let mount = (!(n.constant(0.8).powi(2)) + n.constant(1.5).powi(2)*0.4).normalize() * mount_mask;
     let _y =land*0.3 + mount*(1.-0.3);
 }
 
 fn generate_simplex(mut n: NoiseSource<2>) {
     let cont = (n.simplex(0.7) + n.simplex(3.) * 0.3).normalize();
-    let land = (cont.clone() + n.simplex(9.) * 0.1).normalize().threshold(0.35);
-    let mount_mask = (n.simplex(1.) + n.simplex(2.)*0.3).normalize().threshold(0.2)*land.clone();
+    let land = (&cont + n.simplex(9.) * 0.1).normalize().threshold(0.35);
+    let mount_mask = (n.simplex(1.) + n.simplex(2.)*0.3).normalize().threshold(0.2) * &land;
     let mount = (!(n.simplex(0.8).powi(2)) + n.simplex(1.5).powi(2)*0.4).normalize() * mount_mask;
     let _y = land*0.3 + mount*(1.-0.3);
 }
