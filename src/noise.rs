@@ -59,7 +59,7 @@ impl NoiseSource<2> {
                 ).with_freq(FREQ_C * freq * self.step_by as f32).with_seed(self.seed as i32).generate();
                 Array2::from_shape_vec(
                     (self.lens[0], self.lens[1]), 
-                    res.into_iter().map(|v| 1.-(v*CORRECTION).powi(2).min(1.)).collect_vec()
+                    res.into_iter().map(|v| 1.-(v*CORRECTION).abs().min(1.)).collect_vec()
                 ).unwrap()
             },
             amp: 1f32
