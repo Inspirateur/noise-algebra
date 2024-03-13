@@ -35,13 +35,13 @@ impl<D: Dimension> Mul<f32> for Signal<Array<f32, D>>{
     }
 }
 
-impl<D: Dimension> Mul<Signal<Array<f32, D>>> for f32 {
+impl<D: Dimension> Mul<f32> for &Signal<Array<f32, D>>{
     type Output = Signal<Array<f32, D>>;
 
-    fn mul(self, rhs: Signal<Array<f32, D>>) -> Self::Output {
+    fn mul(self, rhs: f32) -> Self::Output {
         Signal {
-            value: self * rhs.value,
-            amp: self*rhs.amp
+            value: &self.value * rhs,
+            amp: self.amp*rhs
         }
     }
 }
