@@ -9,6 +9,5 @@ pub mod norm;
 pub mod exp;
 pub mod threshold;
 pub mod quantize;
-pub mod pos;
 pub mod grad;
 pub mod erode;

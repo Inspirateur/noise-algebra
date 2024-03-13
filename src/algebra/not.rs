@@ -9,8 +9,8 @@ impl<N> Not for Signal<N>
 
     fn not(self) -> Self::Output {
         Signal {
-            value: self.domain.start()+self.domain.end() - self.value,
-            domain: self.domain
+            value: self.amp - self.value,
+            amp: self.amp
         }
     }
 }
