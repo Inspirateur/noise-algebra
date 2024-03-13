@@ -1,11 +1,9 @@
-use std::ops::{Not, Add, Sub};
+use std::ops::Not;
+use ndarray::{Array, Dimension};
 use crate::Signal;
 
-impl<N> Not for Signal<N>
-    where N: Add<N, Output = N>,
-    f32: Sub<N, Output = N>
-{
-    type Output = Signal<N>;
+impl<D: Dimension> Not for Signal<Array<f32, D>>{
+    type Output = Signal<Array<f32, D>>;
 
     fn not(self) -> Self::Output {
         Signal {

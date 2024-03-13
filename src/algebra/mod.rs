@@ -1,4 +1,3 @@
-pub(crate) mod _is_same;
 pub mod add;
 pub mod sub;
 pub mod mul;
@@ -9,5 +8,7 @@ pub mod norm;
 pub mod exp;
 pub mod threshold;
 pub mod quantize;
+pub mod max;
+pub mod min;
 pub mod grad;
 pub mod erode;

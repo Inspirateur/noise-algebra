@@ -1,14 +1,24 @@
 use std::ops::Add;
+use ndarray::{Array, Dimension};
 use crate::Signal;
 
-impl<N> Add<Signal<N>> for Signal<N>
-    where N: Add<N, Output = N> 
-{
-    type Output = Signal<N>;
+impl<D: Dimension> Add<Signal<Array<f32, D>>> for Signal<Array<f32, D>>{
+    type Output = Signal<Array<f32, D>>;
 
-    fn add(self, rhs: Signal<N>) -> Self::Output {
+    fn add(self, rhs: Signal<Array<f32, D>>) -> Self::Output {
         Signal {
             value: self.value + rhs.value,
+            amp: self.amp+rhs.amp
+        }
+    }
+}
+
+impl<D: Dimension> Add<&Signal<Array<f32, D>>> for Signal<Array<f32, D>>{
+    type Output = Signal<Array<f32, D>>;
+
+    fn add(self, rhs: &Signal<Array<f32, D>>) -> Self::Output {
+        Signal {
+            value: self.value + &rhs.value,
             amp: self.amp+rhs.amp
         }
     }

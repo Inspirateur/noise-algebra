@@ -1,14 +1,11 @@
 use std::ops::Mul;
+use ndarray::{Array, Dimension};
 use crate::Signal;
 
-use super::_is_same::IsSame;
+impl<D: Dimension> Mul<Signal<Array<f32, D>>> for Signal<Array<f32, D>>{
+    type Output = Signal<Array<f32, D>>;
 
-impl<N> Mul<Signal<N>> for Signal<N>
-    where N: Mul<N, Output = N> 
-{
-    type Output = Signal<N>;
-
-    fn mul(self, rhs: Signal<N>) -> Self::Output {
+    fn mul(self, rhs: Signal<Array<f32, D>>) -> Self::Output {
         Signal {
             value: self.value * rhs.value,
             amp: self.amp * rhs.amp
@@ -16,10 +13,19 @@ impl<N> Mul<Signal<N>> for Signal<N>
     }
 }
 
-impl<N> Mul<f32> for Signal<N>
-    where N: Mul<f32, Output = N> 
-{
-    type Output = Signal<N>;
+impl<D: Dimension> Mul<&Signal<Array<f32, D>>> for Signal<Array<f32, D>>{
+    type Output = Signal<Array<f32, D>>;
+
+    fn mul(self, rhs: &Signal<Array<f32, D>>) -> Self::Output {
+        Signal {
+            value: self.value * &rhs.value,
+            amp: self.amp * rhs.amp
+        }
+    }
+}
+
+impl<D: Dimension> Mul<f32> for Signal<Array<f32, D>>{
+    type Output = Signal<Array<f32, D>>;
 
     fn mul(self, rhs: f32) -> Self::Output {
         Signal {
@@ -29,14 +35,10 @@ impl<N> Mul<f32> for Signal<N>
     }
 }
 
-impl<N, __> Mul<Signal<N>> for f32
-    where f32: Mul<N, Output = N>,
-    f32: Mul<__>,
-    N: IsSame<This = __>,
-{
-    type Output = Signal<N>;
+impl<D: Dimension> Mul<Signal<Array<f32, D>>> for f32 {
+    type Output = Signal<Array<f32, D>>;
 
-    fn mul(self, rhs: Signal<N>) -> Self::Output {
+    fn mul(self, rhs: Signal<Array<f32, D>>) -> Self::Output {
         Signal {
             value: self * rhs.value,
             amp: self*rhs.amp

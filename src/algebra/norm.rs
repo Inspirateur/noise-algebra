@@ -1,8 +1,8 @@
-use std::ops::Div;
+use ndarray::{Array, Dimension};
 use crate::Signal;
 
 
-impl<N: Div<f32, Output = N>> Signal<N> {
+impl<D: Dimension> Signal<Array<f32, D>> {
     pub fn normalize(self) -> Self {
         Signal { 
             value: self.value/self.amp, 

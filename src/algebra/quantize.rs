@@ -1,7 +1,7 @@
 use crate::Signal;
-use ndarray::Array1;
+use ndarray::{Array, Dimension};
 
-impl Signal<Array1<f32>> {
+impl<D: Dimension> Signal<Array<f32, D>> {
     pub fn quantize(self, step: f32) -> Self {
         Signal { 
             value: (self.value*step).map(|v| v.floor())/step, 

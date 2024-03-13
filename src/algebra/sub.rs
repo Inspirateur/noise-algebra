@@ -1,14 +1,25 @@
 use std::ops::Sub;
+use ndarray::{Array, Dimension};
+
 use crate::Signal;
 
-impl<N> Sub<Signal<N>> for Signal<N>
-    where N: Sub<N, Output = N> 
-{
-    type Output = Signal<N>;
+impl<D: Dimension> Sub<Signal<Array<f32, D>>> for Signal<Array<f32, D>>{
+    type Output = Signal<Array<f32, D>>;
 
-    fn sub(self, rhs: Signal<N>) -> Self::Output {
+    fn sub(self, rhs: Signal<Array<f32, D>>) -> Self::Output {
         Signal {
             value: self.value - rhs.value,
+            amp: self.amp - rhs.amp
+        }
+    }
+}
+
+impl<D: Dimension> Sub<&Signal<Array<f32, D>>> for Signal<Array<f32, D>>{
+    type Output = Signal<Array<f32, D>>;
+
+    fn sub(self, rhs: &Signal<Array<f32, D>>) -> Self::Output {
+        Signal {
+            value: self.value - &rhs.value,
             amp: self.amp - rhs.amp
         }
     }
