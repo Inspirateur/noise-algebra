@@ -8,7 +8,6 @@ pub mod norm;
 pub mod exp;
 pub mod threshold;
 pub mod quantize;
-pub mod max;
-pub mod min;
+pub mod cap;
 pub mod grad;
 pub mod erode;
