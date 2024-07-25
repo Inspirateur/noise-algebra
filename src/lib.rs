@@ -38,14 +38,14 @@ mod tests {
 
     #[test]
     fn test_range_noise() {
-        let mut n = NoiseSource::new([0..=31, 0..=31], 1, 1);
+        let mut n = NoiseSource::<2>::new([0..=31, 0..=31], 1, 1);
         let sample: Signal<ArrayBase<ndarray::OwnedRepr<f32>, ndarray::prelude::Dim<[usize; 2]>>> = n.simplex(100.);
         assert_normalized(sample.value);
     }
 
     #[test]
     fn test_range_ridge() {
-        let mut n = NoiseSource::new([0..=31, 0..=31], 1, 1);
+        let mut n = NoiseSource::<2>::new([0..=31, 0..=31], 1, 1);
         let sample: Signal<ArrayBase<ndarray::OwnedRepr<f32>, ndarray::prelude::Dim<[usize; 2]>>> = n.ridge(100.);
         assert_normalized(sample.value);
     }

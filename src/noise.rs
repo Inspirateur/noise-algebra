@@ -1,6 +1,6 @@
 use std::ops::RangeInclusive;
 use itertools::Itertools;
-use ndarray::Array2;
+use ndarray::{Array2, Array3};
 use simdnoise::NoiseBuilder;
 use crate::Signal;
 // empirical values to make the output nicer with default inputs
@@ -22,8 +22,8 @@ pub struct NoiseSource<const D: usize> {
     step_by: usize
 }
 
-impl NoiseSource<2> {
-    pub fn new(area: [RangeInclusive<i32>; 2], seed: i32, step_by: usize) -> Self {
+impl<const D: usize> NoiseSource<D> {
+    pub fn new(area: [RangeInclusive<i32>; D], seed: i32, step_by: usize) -> Self {
         NoiseSource { 
             offsets: area.clone().map(|range| (range.start()/step_by as i32) as f32/C as f32),
             lens: area.map(|range| len(range, step_by)),
@@ -31,7 +31,9 @@ impl NoiseSource<2> {
             step_by 
         }
     }
+}
 
+impl NoiseSource<2> {
     pub fn simplex(&mut self, freq: f32) -> Signal<Array2<f32>> {
         self.seed += 1;
         Signal {
@@ -70,6 +72,37 @@ impl NoiseSource<2> {
         Signal {
             value: Array2::from_shape_vec(
                 (self.lens[0], self.lens[1]),
+                vec![value; self.lens.iter()
+                    .fold(1, |a, b| a*b)], 
+            ).unwrap(),
+            amp: value
+        }
+    }
+}
+
+impl NoiseSource<3> {
+    pub fn simplex(&mut self, freq: f32) -> Signal<Array3<f32>> {
+        self.seed += 1;
+        Signal {
+            value: {
+                let (res, _, _) = NoiseBuilder::gradient_3d_offset(
+                    self.offsets[0], self.lens[0], 
+                    self.offsets[1], self.lens[1],
+                    self.offsets[2], self.lens[2],
+                ).with_freq(FREQ_C * freq * self.step_by as f32).with_seed(self.seed as i32).generate();
+                Array3::from_shape_vec(
+                    (self.lens[0], self.lens[1], self.lens[2]), 
+                    res.into_iter().map(|v| (v*CORRECTION+1.).max(0.)/2.).collect_vec()
+                ).unwrap()
+            },
+            amp: 1f32
+        }
+    }
+
+    pub fn constant(&mut self, value: f32) -> Signal<Array3<f32>> {
+        Signal {
+            value: Array3::from_shape_vec(
+                (self.lens[0], self.lens[1], self.lens[2]),
                 vec![value; self.lens.iter()
                     .fold(1, |a, b| a*b)], 
             ).unwrap(),
