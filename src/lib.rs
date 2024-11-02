@@ -1,6 +1,6 @@
 mod noise;
 mod algebra;
-pub use crate::noise::NoiseSource;
+pub use crate::noise::*;
 use std::ops::Deref;
 
 // Positive Signal with amplitude tracking for normalization
@@ -21,7 +21,6 @@ impl<N> Deref for Signal<N> {
 
 #[cfg(test)]
 mod tests {
-    use ndarray::ArrayBase;
     use super::*;
 
     const TOLERANCE: f32 = 0.05;
@@ -39,14 +38,14 @@ mod tests {
     #[test]
     fn test_range_noise() {
         let mut n = NoiseSource::<2>::new([0..=31, 0..=31], 1, 1);
-        let sample: Signal<ArrayBase<ndarray::OwnedRepr<f32>, ndarray::prelude::Dim<[usize; 2]>>> = n.simplex(100.);
+        let sample = n.simplex(100.);
         assert_normalized(sample.value);
     }
 
     #[test]
     fn test_range_ridge() {
         let mut n = NoiseSource::<2>::new([0..=31, 0..=31], 1, 1);
-        let sample: Signal<ArrayBase<ndarray::OwnedRepr<f32>, ndarray::prelude::Dim<[usize; 2]>>> = n.ridge(100.);
+        let sample = n.ridge(100.);
         assert_normalized(sample.value);
     }
 }

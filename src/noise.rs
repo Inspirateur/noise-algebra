@@ -33,8 +33,10 @@ impl<const D: usize> NoiseSource<D> {
     }
 }
 
+pub type Signal2d = Signal<Array2<f32>>;
+
 impl NoiseSource<2> {
-    pub fn simplex(&mut self, freq: f32) -> Signal<Array2<f32>> {
+    pub fn simplex(&mut self, freq: f32) -> Signal2d {
         self.seed += 1;
         Signal {
             value: {
@@ -51,7 +53,7 @@ impl NoiseSource<2> {
         }
     }
 
-    pub fn ridge(&mut self, freq: f32) -> Signal<Array2<f32>> {
+    pub fn ridge(&mut self, freq: f32) -> Signal2d {
         self.seed += 1;
         Signal {
             value: {
@@ -68,7 +70,7 @@ impl NoiseSource<2> {
         }
     }
 
-    pub fn constant(&mut self, value: f32) -> Signal<Array2<f32>> {
+    pub fn constant(&mut self, value: f32) -> Signal2d {
         Signal {
             value: Array2::from_shape_vec(
                 (self.lens[0], self.lens[1]),
@@ -80,8 +82,10 @@ impl NoiseSource<2> {
     }
 }
 
+pub type Signal3d = Signal<Array3<f32>>;
+
 impl NoiseSource<3> {
-    pub fn simplex(&mut self, freq: f32) -> Signal<Array3<f32>> {
+    pub fn simplex(&mut self, freq: f32) -> Signal3d {
         self.seed += 1;
         Signal {
             value: {
@@ -99,7 +103,7 @@ impl NoiseSource<3> {
         }
     }
 
-    pub fn constant(&mut self, value: f32) -> Signal<Array3<f32>> {
+    pub fn constant(&mut self, value: f32) -> Signal3d {
         Signal {
             value: Array3::from_shape_vec(
                 (self.lens[0], self.lens[1], self.lens[2]),

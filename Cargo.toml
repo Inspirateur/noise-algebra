@@ -1,6 +1,6 @@
 [package]
 name = "noise-algebra"
-version = "0.1.26"
+version = "0.1.27"
 edition = "2021"
 license = "Unlicense"
 description = "Easy manipulation of noise functions"
@@ -13,8 +13,7 @@ keywords = ["noise", "procedural", "generation", "simplex", "perlin"]
 num-traits = "0.2"
 noise = "0.9"
 simdnoise = "3.1"
-simdeez = "1.0"
-ndarray = "0.15"
+ndarray = "0.16"
 itertools = "0.13"
 
 [dev-dependencies]
